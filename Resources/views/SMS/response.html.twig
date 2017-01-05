@@ -1,0 +1,11 @@
+{% extends "::base.html.twig" %}
+
+{% block title %}SMSBundle:SMS:Send{% endblock %}
+
+{% block body %}
+<h1>Response to your message</h1>
+<p>You requested :</p>
+<p>{{ requestBody }}</p>
+<p>Our answer :</p>
+<p>{{ response.body }}</p>
+{% endblock %}
