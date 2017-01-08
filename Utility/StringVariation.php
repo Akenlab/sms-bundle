@@ -1,6 +1,6 @@
 <?php
 
-namespace SMSBundle\Utility;
+namespace Akenlab\SMSBundle\Utility;
 
 
 class StringVariation
@@ -14,10 +14,15 @@ class StringVariation
         		$variations[]="...C'est pas faux";
         		$variations[]="Je ne sais que répondre...";
         		break;
-        	case "deaf.dialogue":
-        		$variations[]="Visiblement, nous ne nous comprenons pas : arrêtons cette conversation :-)";
-        		$variations[]="Êtes vous sûr de vouloir continuer cette discussion ?";
-        		break;
+            case "deaf.dialogue":
+                $variations[]="Visiblement, nous ne nous comprenons pas : arrêtons cette conversation :-)";
+                $variations[]="Êtes vous sûr de vouloir continuer cette discussion ?";
+                break;
+            case "thanks":
+                $variations[]="Avec plaisir";
+                $variations[]="À votre service";
+                $variations[]="C'est normal";
+                break;
         	default:
         		$variations=array($string);
         		break;

@@ -1,6 +1,6 @@
 <?php
 
-namespace SMSBundle\Repository;
+namespace Akenlab\SMSBundle\Repository;
 
 /**
  * NumberRepository
@@ -10,4 +10,15 @@ namespace SMSBundle\Repository;
  */
 class NumberRepository extends \Doctrine\ORM\EntityRepository
 {
+	public function findWithState(array $allowedStates){
+		if(count($allowedStates)){
+			$qb = $this->createQueryBuilder('n');
+			return $qb 	-> where($qb->expr()->in('n.state',':states'))
+			    		-> setParameter('states', $allowedStates)
+			 			-> getQuery()
+			 			-> getResult();
+		}else{
+			return $this->findAll();
+		}
+	}
 }

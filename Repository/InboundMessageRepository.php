@@ -1,6 +1,6 @@
 <?php
 
-namespace SMSBundle\Repository;
+namespace Akenlab\SMSBundle\Repository;
 
 /**
  * InboundMessageRepository

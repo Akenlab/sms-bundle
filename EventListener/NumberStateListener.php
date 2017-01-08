@@ -1,10 +1,10 @@
 <?php
 
-namespace SMSBundle\EventListener;
+namespace Akenlab\SMSBundle\EventListener;
 
 use Symfony\Component\Workflow\Event\Event;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use SMSBundle\SMSEngine\SMSEngine;
+use Akenlab\SMSBundle\SMSEngine\SMSEngine;
 
 class NumberStateListener implements EventSubscriberInterface
 {
@@ -17,7 +17,7 @@ class NumberStateListener implements EventSubscriberInterface
 
     public function leave(Event $event)
     {
-        
+        dump($event);
     }
     public function enter(Event $event)
     {

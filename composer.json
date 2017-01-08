@@ -1,0 +1,17 @@
+{
+    "name": "akenlab/sms-bundle",
+    "description": "Create a minimal SMS bot",
+    "require": {
+        "php": "^5.6.0 || ^7.0",
+        "symfony/symfony": "3.2.*",
+        "twilio/sdk": "^5.4",
+        "symfony/dependency-injection": "^3.2",
+        "symfony/workflow": "^3.2",
+        "doctrine/orm": "^2.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "Akenlab\\SMSBundle\\": ""
+        }
+    }
+}

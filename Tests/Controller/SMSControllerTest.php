@@ -1,6 +1,6 @@
 <?php
 
-namespace SMSBundle\Tests\Controller;
+namespace Akenlab\SMSBundle\Tests\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 

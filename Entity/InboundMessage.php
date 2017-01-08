@@ -1,6 +1,6 @@
 <?php
 
-namespace SMSBundle\Entity;
+namespace Akenlab\SMSBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
  * InboundMessage
  *
  * @ORM\Table(name="inbound_message")
- * @ORM\Entity(repositoryClass="SMSBundle\Repository\InboundMessageRepository")
+ * @ORM\Entity(repositoryClass="Akenlab\SMSBundle\Repository\InboundMessageRepository")
  */
 class InboundMessage
 {
@@ -107,7 +107,7 @@ class InboundMessage
      *
      * @return InboundMessage
      */
-    public function setResponse(\SMSBundle\Entity\Response $response = null)
+    public function setResponse(\Akenlab\SMSBundle\Entity\Response $response = null)
     {
         $this->response = $response;
 

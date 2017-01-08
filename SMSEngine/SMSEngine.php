@@ -1,20 +1,21 @@
 <?php
 
-namespace SMSBundle\SMSEngine;
+namespace Akenlab\SMSBundle\SMSEngine;
 
-use SMSBundle\Entity\Number;
-use SMSBundle\Entity\Response;
+use Akenlab\SMSBundle\Entity\Number;
+use Akenlab\SMSBundle\Entity\Response;
 
 use Twilio\Rest\Client;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Twilio\Exceptions\RestException;
-use SMSBundle\Utility\StringVariation;
+use Akenlab\SMSBundle\Utility\StringVariation;
 
 class SMSEngine
 {
 	private $sid;
 	private $token;
 	private $client;
+	private $logger;
     protected $container;
     protected $em;
 
@@ -31,6 +32,8 @@ class SMSEngine
 		$this->token=$this->container->getParameter('sms.twilio.token');
 		$this->sender=$this->container->getParameter('sms.twilio.sender');
 		$this->client = new Client($this->sid, $this->token);
+		$this->logger = $this->container->get('logger');
+
 	}
 
     public function respond( $body, Number $number)
@@ -88,7 +91,12 @@ class SMSEngine
 
 
 	public function sendSMS($body, $recipient){
-//		return true;
+		$debug = $this->container->get('kernel')->isDebug();
+		if($debug){
+			$this->logger->info("Sent SMS : \"".$body."\" to ".$recipient);
+			return true;
+		}
+		$this->logger->info("Send SMS to ".$recipient);
 		return $this->client->messages->create(
 		    $recipient,
 		    array(
@@ -105,11 +113,12 @@ class SMSEngine
 	*/
 	public function validateNumber($rawNumber){ 
         try{
-        	$rawnumber=$this->client->lookups->phoneNumbers($rawNumber)->fetch(array("PhoneNumber"))->phoneNumber;
+        	$rawNumber=$this->client->lookups->phoneNumbers($rawNumber)->fetch(array("PhoneNumber"))->phoneNumber;
         	$number=new Number();
 	        $number->setNumber($rawNumber);
 	        $this->em->persist($number);
 	        $this->em->flush();
+    		$this->logger->info("New number stored :".$rawNumber);
 	        return $number;
         } catch (RestException $e) {
         	throw new \Exception("Unreachable number", 1);

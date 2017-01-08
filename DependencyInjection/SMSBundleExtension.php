@@ -1,6 +1,6 @@
 <?php
 
-namespace SMSBundle\DependencyInjection;
+namespace Akenlab\SMSBundle\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Config\FileLocator;

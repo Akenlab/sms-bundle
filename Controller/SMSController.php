@@ -1,63 +1,14 @@
 <?php
 
-namespace SMSBundle\Controller;
+namespace Akenlab\SMSBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use SMSBundle\Entity\Number;
+use Akenlab\SMSBundle\Entity\Number;
 
 class SMSController extends Controller
 {
-    public function sendMultiple($body, $recipients)
-    {
-        foreach($recipients as $recipient){
-            $this -> send($body, $recipient);
-        }
-        return;
-    }
-    public function send($body, $recipient)
-    {
-        $sms = $this->container->get('sms_bundle.sms');
-        return $sms -> sendSMS($body, $recipient->getNumber());
-    }
-
-    /**
-     * @Route("send/link")
-     */
-    public function SendLinkAction()
-    {
-        $recipients=$this->getRecipients();
-
-        foreach($recipients as $recipient){
-
-        }
-        $this->sendMultiple('Visitez le site : http://www.google.com',$recipients);
-        return $this->render('SMSBundle:SMS:send.html.twig', array(
-        ));
-    }
-    /**
-     * @Route("send/invite")
-     */
-    public function SendInviteAction()
-    {
-        $workflow = $this->container->get('state_machine.numbers_state');
-        $recipients=$this->getRecipients();
-        foreach($recipients as $recipient){
-            if($workflow->can($recipient, 'invite')){
-                $this -> send('Intéressé par le comité numérique SPIE ? Répondez "oui" à ce SMS', $recipient);
-                $workflow->apply($recipient, 'invite');
-                $logs[]=array("recipient"=>$recipient,"status"=>"success");
-            }else{
-                $this -> send('Pas possible inviter', $recipient);
-                $logs[]=array("recipient"=>$recipient,"status"=>"failed (bad status)");
-            }
-        }
-        return $this->render('SMSBundle:SMS:send.html.twig', array(
-            "logs"=>$logs
-        ));
-    }
-
 
     /**
      * @Route("twilio/callback")
@@ -89,11 +40,35 @@ class SMSController extends Controller
         ));
     }
 
-    public function getRecipients()
+    public function sendMultiple($body, $targetStates, $transition)
     {
-        return $this->getDoctrine()
-        ->getRepository('SMSBundle:Number')
-        ->findAll();
+        $workflow = $this->container->get('state_machine.numbers_state');
+        $recipients=$this->getRecipients($targetStates);
+        $logs=array();
+        foreach($recipients as $recipient){
+            if($workflow->can($recipient, $transition)){
+                $this -> send($body, $recipient);
+                $workflow->apply($recipient, $transition);
+                $logs[]=array("recipient"=>$recipient,"status"=>"success");
+            }else{
+                $logger = $this->container->get('logger');
+                $logger->info("Unable to apply '".$transition."'' to ".$recipient->getNumber());
+            }
+        }
+        $em = $this->getDoctrine()->getManager()->flush();
+    }
+
+    public function send($body, $recipient)
+    {
+        $sms = $this->container->get('sms_bundle.sms');
+        return $sms -> sendSMS($body, $recipient->getNumber());
+    }
+
+    public function getRecipients(array $allowedStates=array())
+    {
+        return $this    ->getDoctrine()
+                        ->getRepository('SMSBundle:Number')
+                        ->findWithState($allowedStates);
     }
 
     public function cleanUp($message){

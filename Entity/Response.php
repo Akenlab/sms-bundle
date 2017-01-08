@@ -1,6 +1,6 @@
 <?php
 
-namespace SMSBundle\Entity;
+namespace Akenlab\SMSBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
  * Response
  *
  * @ORM\Table(name="response")
- * @ORM\Entity(repositoryClass="SMSBundle\Repository\ResponseRepository")
+ * @ORM\Entity(repositoryClass="Akenlab\SMSBundle\Repository\ResponseRepository")
  */
 class Response
 {

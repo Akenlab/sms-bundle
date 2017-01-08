@@ -1,9 +1,9 @@
 services:
   sms_bundle.sms:
-    class: SMSBundle\SMSEngine\SMSEngine
+    class: Akenlab\SMSBundle\SMSEngine\SMSEngine
     arguments: [ '@service_container' ]
   app.exception_listener:
-    class: SMSBundle\EventListener\NumberStateListener
+    class: Akenlab\SMSBundle\EventListener\NumberStateListener
     arguments: [ '@sms_bundle.sms' ]
     tags:
       - { name: kernel.event_listener, event: workflow.numbers_state.leave, method: leave }
