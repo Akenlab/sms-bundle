@@ -83,7 +83,7 @@ class SMSEngine
 	        $response->setBody(null);
         }
 	    if($response->getBody() !== null){
-	    	if($response->getBody() === "evasive.answer" && $alwaysAnswer){
+	    	if($response->getBody() !== "evasive.answer" || $alwaysAnswer){
 		    	$this->sendSMS(StringVariation::fetch($response->getBody()), $number->getNumber());
 		    	$number->setLastSent($response->getBody());
 		    }
