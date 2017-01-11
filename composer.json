@@ -9,6 +9,8 @@
         "symfony/workflow": "^3.2",
         "doctrine/orm": "^2.5"
     },
+    "license": "MIT",
+    "keywords": ["sms", "bot", "twilio"],
     "autoload": {
         "psr-4": {
             "Akenlab\\SMSBundle\\": ""
