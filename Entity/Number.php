@@ -25,7 +25,7 @@ class Number
     /**
      * @var int
      *
-     * @ORM\Column(name="rambleOnCounter", type="integer")
+     * @ORM\Column(name="rambleOnCounter", type="integer", nullable=true)
      */
     private $rambleOnCounter;
 

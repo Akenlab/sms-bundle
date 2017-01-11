@@ -4,11 +4,14 @@ namespace Akenlab\SMSBundle\SMSEngine;
 
 use Akenlab\SMSBundle\Entity\Number;
 use Akenlab\SMSBundle\Entity\Response;
+use Akenlab\SMSBundle\Event\NumberRegisteredEvent;
 
 use Twilio\Rest\Client;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Twilio\Exceptions\RestException;
 use Akenlab\SMSBundle\Utility\StringVariation;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+
 
 class SMSEngine
 {
@@ -36,7 +39,7 @@ class SMSEngine
 
 	}
 
-    public function respond( $body, Number $number)
+    public function respond( $body, Number $number, $alwaysAnswer=true)
     {
         
         $response=new Response();
@@ -80,7 +83,10 @@ class SMSEngine
 	        $response->setBody(null);
         }
 	    if($response->getBody() !== null){
-	    	$this->sendSMS(StringVariation::fetch($response->getBody()), $number->getNumber());
+	    	if($response->getBody() === "evasive.answer" && $alwaysAnswer){
+		    	$this->sendSMS(StringVariation::fetch($response->getBody()), $number->getNumber());
+		    	$number->setLastSent($response->getBody());
+		    }
 	    }
 	    if($response->getTransition()){
 	        $workflow->apply($number, $response->getTransition());
@@ -116,9 +122,13 @@ class SMSEngine
         	$rawNumber=$this->client->lookups->phoneNumbers($rawNumber)->fetch(array("PhoneNumber"))->phoneNumber;
         	$number=new Number();
 	        $number->setNumber($rawNumber);
-	        $this->em->persist($number);
-	        $this->em->flush();
-    		$this->logger->info("New number stored :".$rawNumber);
+	        $number->setState("base");
+	        //$this->em->persist($number);
+	        //$this->em->flush();
+	        $event = new NumberRegisteredEvent($number);
+			$dispatcher = $this->container->get('event_dispatcher');
+			$dispatcher->dispatch(NumberRegisteredEvent::NAME, $event);
+    		$this->logger->info("New number registered :".$rawNumber);
 	        return $number;
         } catch (RestException $e) {
         	throw new \Exception("Unreachable number", 1);

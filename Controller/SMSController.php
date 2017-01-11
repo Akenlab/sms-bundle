@@ -20,6 +20,7 @@ class SMSController extends Controller
             throw new \Exception("Phone number is mandatory", 1);
             
         }
+        $alwaysAnswer=true;
         $body=$this->cleanUp($request->request->get('Body',""));
         $number = $this ->getDoctrine()
                         ->getRepository('SMSBundle:Number')
@@ -27,10 +28,10 @@ class SMSController extends Controller
         $smsEngine = $this->container->get('sms_bundle.sms');
         if(!$number && $from){ // We don't know this number yet
             $number = $smsEngine -> validateNumber($from);
+            $alwaysAnswer=false;
         }
         $number->setLastReceived($body);
-        $response = $smsEngine -> respond($body,$number);
-        $number->setLastSent($response->getBody());
+        $response = $smsEngine -> respond($body,$number,$alwaysAnswer);
         $this->get('doctrine')->getManager()->persist($number);
         $this->get('doctrine')->getManager()->flush();
 
