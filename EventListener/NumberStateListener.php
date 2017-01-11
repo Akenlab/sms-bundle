@@ -17,7 +17,7 @@ class NumberStateListener implements EventSubscriberInterface
 
     public function leave(Event $event)
     {
-        dump($event);
+
     }
     public function enter(Event $event)
     {
