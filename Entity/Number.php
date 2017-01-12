@@ -99,8 +99,15 @@ class Number
      */
     private $lastSentAge;
 
+    /**
+     * @ORM\OneToMany(targetEntity="Message", mappedBy="number")
+     */
+    private $messages;
+
+
     public function __construct()
     {
+        $this->messages = new ArrayCollection();
         $this->state="base";
         $this->label="";
     }

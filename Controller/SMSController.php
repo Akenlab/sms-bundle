@@ -6,6 +6,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Akenlab\SMSBundle\Entity\Number;
+use Akenlab\SMSBundle\Entity\Message;
+
 
 class SMSController extends Controller
 {
@@ -30,6 +32,10 @@ class SMSController extends Controller
             $number = $smsEngine -> validateNumber($from);
             $alwaysAnswer=false;
         }
+
+        $message=$smsEngine -> storeMessage($request->request->get('Body',""),$number,'inbound');
+        $this->get('doctrine')->getManager()->persist($message);
+
         $number->setLastReceived($body);
         $response = $smsEngine -> respond($body,$number,$alwaysAnswer);
         $this->get('doctrine')->getManager()->persist($number);

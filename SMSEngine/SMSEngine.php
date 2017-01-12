@@ -3,6 +3,7 @@
 namespace Akenlab\SMSBundle\SMSEngine;
 
 use Akenlab\SMSBundle\Entity\Number;
+use Akenlab\SMSBundle\Entity\Message;
 use Akenlab\SMSBundle\Entity\Response;
 use Akenlab\SMSBundle\Event\NumberRegisteredEvent;
 
@@ -84,7 +85,12 @@ class SMSEngine
         }
 	    if($response->getBody() !== null){
 	    	if($response->getBody() !== "evasive.answer" || $alwaysAnswer){
-		    	$this->sendSMS(StringVariation::fetch($response->getBody()), $number->getNumber());
+	    		$body=StringVariation::fetch($response->getBody());
+		    	$this->sendSMS($body, $number->getNumber());
+
+		        $message=$this->storeMessage($body,$number,"outbound");
+		        $this->em->persist($message);
+
 		    	$number->setLastSent($response->getBody());
 		    }
 	    }
@@ -103,6 +109,7 @@ class SMSEngine
 			return true;
 		}
 		$this->logger->info("Send SMS to ".$recipient);
+
 		return $this->client->messages->create(
 		    $recipient,
 		    array(
@@ -134,5 +141,15 @@ class SMSEngine
         	throw new \Exception("Unreachable number", 1);
         }
 	}
+
+	public function storeMessage($body,$number,$direction){
+        $message=new Message();
+        $message->setBody($body);
+        $message->setDate(new \DateTime());
+        $message->setNumber($number);
+        $message->setDirection($direction);
+        return $message;
+	}
+
 }
 ?>
