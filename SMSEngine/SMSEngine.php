@@ -6,6 +6,7 @@ use Akenlab\SMSBundle\Entity\Number;
 use Akenlab\SMSBundle\Entity\Message;
 use Akenlab\SMSBundle\Entity\Response;
 use Akenlab\SMSBundle\Event\NumberRegisteredEvent;
+use Akenlab\SMSBundle\Event\SMSEvent;
 
 use Twilio\Rest\Client;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -86,10 +87,7 @@ class SMSEngine
 	    if($response->getBody() !== null){
 	    	if($response->getBody() !== "evasive.answer" || $alwaysAnswer){
 	    		$body=StringVariation::fetch($response->getBody());
-		    	$this->sendSMS($body, $number->getNumber());
-
-		        $message=$this->storeMessage($body,$number,"outbound");
-		        $this->em->persist($message);
+		    	$this->sendSMS($body, $number);
 
 		    	$number->setLastSent($response->getBody());
 		    }
@@ -102,21 +100,29 @@ class SMSEngine
     }
 
 
-	public function sendSMS($body, $recipient){
+	public function sendSMS($body, $number){
 		$debug = $this->container->get('kernel')->isDebug();
-		if($debug){
-			$this->logger->info("Sent SMS : \"".$body."\" to ".$recipient);
-			return true;
-		}
-		$this->logger->info("Send SMS to ".$recipient);
+		
+		$this->storeMessage($body,$number,"outbound");
 
-		return $this->client->messages->create(
-		    $recipient,
-		    array(
-		        'from' => $this->sender,
-		        'body' => $body
-		    )
-		);
+		$dispatcher = $this->container->get('event_dispatcher');
+		$dispatcher->dispatch("sms.sent", new SMSEvent($body,$number));
+
+		$this->logger->info("Sending SMS to ".$number->getNumber());
+
+		if($debug){
+			$sent = true;
+		}else{
+			$sent=$this->client->messages->create(
+			    $number->getNumber(),
+			    array(
+			        'from' => $this->sender,
+			        'body' => $body
+			    )
+			);
+		}
+
+		return $sent;
 	}
 
 	/**
@@ -148,6 +154,8 @@ class SMSEngine
         $message->setDate(new \DateTime());
         $message->setNumber($number);
         $message->setDirection($direction);
+        $this->em->persist($message);
+
         return $message;
 	}
 

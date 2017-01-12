@@ -36,7 +36,7 @@ class Message
     private $date;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Number", inversedBy="Messages")
+     * @ORM\ManyToOne(targetEntity="Number", inversedBy="messages")
      * @ORM\JoinColumn(name="number_id", referencedColumnName="id")
      */
     private $number;

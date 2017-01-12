@@ -113,6 +113,14 @@ class Number
         $this->label="";
     }
 
+    public function __toString()
+    {
+        if($this->label !== ""){
+            return $this->label;
+        }
+        return $this->number;
+    }
+
 
     /**
      * Get id

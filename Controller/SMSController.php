@@ -7,6 +7,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Akenlab\SMSBundle\Entity\Number;
 use Akenlab\SMSBundle\Entity\Message;
+use Akenlab\SMSBundle\Event\SMSEvent;
 
 
 class SMSController extends Controller
@@ -17,12 +18,14 @@ class SMSController extends Controller
      */
     public function APICallBackAction(Request $request)
     {
+        $alwaysAnswer=true;
+        
         $from=$request->request->get('From');
         if(!$from){
             throw new \Exception("Phone number is mandatory", 1);
             
         }
-        $alwaysAnswer=true;
+        
         $body=$this->cleanUp($request->request->get('Body',""));
         $number = $this ->getDoctrine()
                         ->getRepository('SMSBundle:Number')
@@ -30,11 +33,12 @@ class SMSController extends Controller
         $smsEngine = $this->container->get('sms_bundle.sms');
         if(!$number && $from){ // We don't know this number yet
             $number = $smsEngine -> validateNumber($from);
-            $alwaysAnswer=false;
+            $alwaysAnswer=false; // There will be an answer through welcome message
         }
 
         $message=$smsEngine -> storeMessage($request->request->get('Body',""),$number,'inbound');
-        $this->get('doctrine')->getManager()->persist($message);
+        $dispatcher = $this->container->get('event_dispatcher');
+        $dispatcher->dispatch("sms.received", new SMSEvent($request->request->get('Body',""),$number));
 
         $number->setLastReceived($body);
         $response = $smsEngine -> respond($body,$number,$alwaysAnswer);
@@ -68,7 +72,7 @@ class SMSController extends Controller
     public function send($body, $recipient)
     {
         $sms = $this->container->get('sms_bundle.sms');
-        return $sms -> sendSMS($body, $recipient->getNumber());
+        return $sms -> sendSMS($body, $recipient);
     }
 
     public function getRecipients(array $allowedStates=array())
