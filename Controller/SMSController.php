@@ -45,7 +45,7 @@ class SMSController extends Controller
         $this->get('doctrine')->getManager()->persist($number);
         $this->get('doctrine')->getManager()->flush();
 
-        return $this->render('SMSBundle:SMS:response.html.twig', array(
+        return $this->render('SMSBundle:SMS:response.xml.twig', array(
             "response"=>$response,
             "requestBody"=>$body,
         ));
