@@ -47,9 +47,23 @@ class Number
     /**
      * @var string
      *
-     * @ORM\Column(name="label", type="string", length=255)
+     * @ORM\Column(name="pseudo", type="string", length=255, nullable=true)
      */
-    private $label;
+    private $pseudo;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="firstname", type="string", length=255, nullable=true)
+     */
+    private $firstname;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="lastname", type="string", length=255, nullable=true)
+     */
+    private $lastname;
 
     /**
      * @var bool
@@ -110,13 +124,13 @@ class Number
     {
         $this->messages = new ArrayCollection();
         $this->state="base";
-        $this->label="";
+        $this->pseudo="";
     }
 
     public function __toString()
     {
-        if($this->label !== ""){
-            return $this->label;
+        if($this->pseudo !== ""){
+            return $this->pseudo;
         }
         return $this->number;
     }
@@ -183,25 +197,73 @@ class Number
     /**
      * Set label
      *
-     * @param string $label
+     * @param string $pseudo
      *
      * @return Number
      */
-    public function setLabel($label)
+    public function setPseudo($pseudo)
     {
-        $this->label = $label;
+        $this->pseudo = $pseudo;
 
         return $this;
     }
 
     /**
-     * Get label
+     * Get pseudo
      *
      * @return string
      */
-    public function getLabel()
+    public function getPseudo()
     {
-        return $this->label;
+        return $this->pseudo;
+    }
+
+    /**
+     * Set firstname
+     *
+     * @param string $firstname
+     *
+     * @return Number
+     */
+    public function setFirstname($firstname)
+    {
+        $this->firstname = $firstname;
+
+        return $this;
+    }
+
+    /**
+     * Get firstname
+     *
+     * @return string
+     */
+    public function getFirstname()
+    {
+        return $this->firstname;
+    }
+
+    /**
+     * Set lastname
+     *
+     * @param string $lastname
+     *
+     * @return Number
+     */
+    public function setLastname($lastname)
+    {
+        $this->lastname = $lastname;
+
+        return $this;
+    }
+
+    /**
+     * Get lastname
+     *
+     * @return string
+     */
+    public function getLastname()
+    {
+        return $this->lastname;
     }
 
     /**
