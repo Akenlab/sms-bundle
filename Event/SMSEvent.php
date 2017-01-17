@@ -6,7 +6,7 @@ use Symfony\Component\EventDispatcher\Event;
 use Akenlab\SMSBundle\Entity\Number;
 
 /**
- * The sms.sent event is dispatched each time an SMS is sent
+ * The sms.post.send event is dispatched each time an SMS is sent
  */
 class SMSEvent extends Event
 {
@@ -17,6 +17,7 @@ class SMSEvent extends Event
     public function __construct($body,Number $number)
     {
         $this->number = $number;
+        $this->body = $body;
     }
 
     public function getNumber()
@@ -26,5 +27,9 @@ class SMSEvent extends Event
     public function getBody()
     {
         return $this->body;
+    }
+    public function setBody($body)
+    {
+        $this->body=(string)$body;
     }
 }

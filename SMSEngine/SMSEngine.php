@@ -102,11 +102,14 @@ class SMSEngine
 
 	public function sendSMS($body, $number){
 		$debug = $this->container->get('kernel')->isDebug();
-		
+		$dispatcher = $this->container->get('event_dispatcher');
+		$event=$dispatcher->dispatch("sms.pre.send", new SMSEvent($body,$number));
+		$body=$event->getBody();
+
 		$this->storeMessage($body,$number,"outbound");
 
 		$dispatcher = $this->container->get('event_dispatcher');
-		$dispatcher->dispatch("sms.sent", new SMSEvent($body,$number));
+		$dispatcher->dispatch("sms.post.send", new SMSEvent($body,$number));
 
 		$this->logger->info("Sending SMS to ".$number->getNumber());
 
@@ -144,6 +147,7 @@ class SMSEngine
     		$this->logger->info("New number registered :".$rawNumber);
 	        return $number;
         } catch (RestException $e) {
+    		$this->logger->error("Unreachable number : ".$rawNumber);
         	throw new \Exception("Unreachable number", 1);
         }
 	}
