@@ -135,7 +135,10 @@ class SMSEngine
 	*/
 	public function validateNumber($rawNumber){ 
         try{
-        	$rawNumber=$this->client->lookups->phoneNumbers($rawNumber)->fetch(array("PhoneNumber"))->phoneNumber;
+			$debug = $this->container->get('kernel')->isDebug();
+        	if(!$debug){
+				$rawNumber=$this->client->lookups->phoneNumbers($rawNumber)->fetch(array("PhoneNumber"))->phoneNumber;
+			}
         	$number=new Number();
 	        $number->setNumber($rawNumber);
 	        $number->setState("base");

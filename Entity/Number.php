@@ -291,6 +291,16 @@ class Number
     }
 
     /**
+     * Get messages
+     *
+     * @return ArrayCollection
+     */
+    public function getMessages()
+    {
+        return $this->messages;
+    }
+
+    /**
      * Set lastInteractionDate
      *
      * @param \DateTime $lastInteractionDate
